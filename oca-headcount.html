@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>OCA Head Count</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --purple: #5b2d8e;
+    --purple-dark: #3a1a5c;
+    --purple-light: #7c4db5;
+    --purple-pale: #f3eeff;
+    --purple-mid: #e0ccff;
+    --gold: #c9a84c;
+    --white: #ffffff;
+    --bg: #f5f0fc;
+    --ink: #1a0a2e;
+    --muted: #7a6a92;
+    --border: #d8c8f0;
+    --red: #c0392b;
+    --green: #1a7a3a;
+    --shadow: 0 2px 16px rgba(91,45,142,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Montserrat', sans-serif; min-height: 100vh; padding-bottom: 80px; }
+
+  header {
+    background: linear-gradient(135deg, var(--purple-dark) 0%, var(--purple) 60%, var(--purple-light) 100%);
+    padding: 16px 18px 13px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 3px 16px rgba(91,45,142,0.4);
+    display: flex; align-items: center; gap: 13px;
+  }
+  .logo-box {
+    width: 50px; height: 50px; border-radius: 10px; background: #fff;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2); padding: 5px;
+    font-family: 'Montserrat', sans-serif; text-align: center; line-height: 1.15;
+  }
+  .logo-box .logo-oasis { font-size: 13px; font-weight: 900; color: var(--purple); letter-spacing: -0.5px; display: block; }
+  .logo-box .logo-sub { font-size: 7.5px; font-weight: 700; color: var(--purple-dark); letter-spacing: 0.2px; display: block; }
+  .header-text h1 { font-size: 14px; font-weight: 900; color: #fff; line-height: 1.25; letter-spacing: 0.3px; }
+  .header-text .tagline { font-size: 8px; color: rgba(255,255,255,0.6); letter-spacing: 0.4px; text-transform: uppercase; margin-top: 2px; }
+  .header-text .sub { font-size: 10px; color: var(--gold); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 4px; font-weight: 700; }
+
+  .tabs { display: flex; background: var(--purple-dark); border-top: 1px solid rgba(255,255,255,0.08); }
+  .tab {
+    flex: 1; padding: 11px 6px; border: none; background: transparent;
+    color: rgba(255,255,255,0.45); font-family: 'Montserrat', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .page { display: none; padding: 16px; max-width: 520px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .meta-bar {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; display: flex; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .meta-field { flex: 1; min-width: 130px; }
+  .meta-field label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); display: block; margin-bottom: 4px; font-weight: 700; }
+  .meta-field input {
+    width: 100%; background: var(--purple-pale); border: 1.5px solid var(--border);
+    border-radius: 7px; padding: 8px 10px;
+    font-family: 'Montserrat', sans-serif; font-size: 13px; color: var(--ink); font-weight: 600;
+  }
+  .meta-field input:focus { outline: none; border-color: var(--purple); }
+
+  .svc-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .svc-btn {
+    flex: 1; padding: 12px 8px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--white); font-family: 'Montserrat', sans-serif; font-size: 12px;
+    font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.18s;
+  }
+  .svc-btn.active { border-color: var(--purple); background: var(--purple); color: #fff; box-shadow: 0 3px 14px rgba(91,45,142,0.35); }
+
+  .service-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .service-header {
+    background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+    color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .service-header .svc-name { font-family: 'Lora', serif; font-size: 17px; font-style: italic; font-weight: 600; }
+  .overall-badge { background: var(--gold); color: var(--purple-dark); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+  .service-body { padding: 14px 16px; }
+
+  .row-group { margin-bottom: 14px; }
+  .row-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--purple); margin-bottom: 7px; padding-bottom: 5px; border-bottom: 2px solid var(--purple-mid); font-weight: 700; }
+
+  .count-row { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; }
+  .count-row label { font-size: 13px; color: var(--ink); flex: 1; font-weight: 500; }
+  .counter { display: flex; align-items: center; border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden; }
+  .counter button { width: 38px; height: 38px; border: none; cursor: pointer; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+  .btn-minus { background: #fde8e8; color: var(--red); }
+  .btn-minus:active { background: #f5c0c0; }
+  .btn-plus { background: #e6f9ee; color: var(--green); }
+  .btn-plus:active { background: #c0edce; }
+  .val { min-width: 46px; text-align: center; font-size: 18px; font-weight: 700; background: #fff; line-height: 38px; color: var(--purple-dark); }
+
+  .computed-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-top: 1px dashed var(--border); margin-top: 6px; }
+  .computed-row label { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .computed-row .cval { font-size: 15px; font-weight: 700; color: var(--ink); }
+
+  .overall-row {
+    background: linear-gradient(135deg, var(--purple-pale), var(--purple-mid));
+    border-radius: 10px; padding: 12px 14px; margin-top: 12px;
+    display: flex; justify-content: space-between; align-items: center;
+    border: 1.5px solid var(--purple-light);
+  }
+  .overall-row label { font-size: 14px; font-weight: 700; color: var(--purple-dark); }
+  .overall-row .cval { font-size: 28px; font-weight: 900; color: var(--purple); }
+
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn { flex: 1; padding: 14px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; transition: all 0.15s; }
+  .btn-reset { background: var(--border); color: var(--muted); }
+  .btn-save { background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; box-shadow: 0 3px 12px rgba(91,45,142,0.3); }
+  .btn-save:active { opacity: 0.85; }
+  .btn-saved { background: var(--green) !important; color: #fff !important; }
+
+  /* Report */
+  .report-select-wrap { margin: 14px 0 10px; }
+  .report-select-wrap label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); font-weight: 700; display: block; margin-bottom: 5px; }
+  .report-select-wrap select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 9px; font-family: 'Montserrat', sans-serif; font-size: 13px; background: var(--white); color: var(--ink); }
+  .report-box { background: var(--purple-dark); color: #e0ccff; border-radius: 12px; padding: 16px; font-size: 12.5px; line-height: 1.9; font-family: 'Courier New', monospace; margin-top: 10px; white-space: pre-wrap; word-break: break-word; border: 1px solid var(--purple-light); }
+  .copy-btn { width: 100%; margin-top: 10px; padding: 13px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; border: none; border-radius: 10px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 3px 12px rgba(91,45,142,0.3); }
+  .copy-btn:active { opacity: 0.85; }
+
+  /* History */
+  .history-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .history-head { background: linear-gradient(135deg, var(--purple-pale), var(--purple-mid)); border-bottom: 1px solid var(--border); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+  .history-head .hdate { font-size: 13px; font-weight: 700; color: var(--purple-dark); }
+  .history-head .hsvc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .hdelete { background: none; border: none; color: #bbb; font-size: 18px; cursor: pointer; }
+  .history-body { padding: 10px 14px; font-size: 13px; line-height: 2; }
+  .hrow { display: flex; justify-content: space-between; }
+  .hrow span { color: var(--muted); }
+  .hrow strong { color: var(--ink); font-weight: 600; }
+  .htotal { font-size: 20px; font-weight: 900; color: var(--purple); margin-top: 4px; }
+  .husher { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); border: 1.5px dashed var(--border); border-radius: 12px; font-size: 13px; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-box">
+    <span class="logo-oasis">OASIS</span>
+    <span class="logo-sub">CHRISTIAN<br>ASSEMBLY</span>
+  </div>
+  <div class="header-text">
+    <h1>OASIS CHRISTIAN ASSEMBLY</h1>
+    <div class="tagline">Taking the Love of God to Everyone Everywhere</div>
+    <div class="sub">✝ Usher Head Count</div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('count',this)">📋 Count</button>
+  <button class="tab" onclick="showTab('report',this)">📤 Report</button>
+  <button class="tab" onclick="showTab('history',this)">🗂 History</button>
+</div>
+
+<!-- COUNT -->
+<div id="tab-count" class="page active">
+  <div class="meta-bar" style="margin-top:14px">
+    <div class="meta-field">
+      <label>Date</label>
+      <input type="date" id="svc-date" />
+    </div>
+    <div class="meta-field">
+      <label>Head Count By</label>
+      <input type="text" id="usher-name" placeholder="e.g. Sr Nomthandazo" />
+    </div>
+  </div>
+
+  <div class="svc-toggle">
+    <button class="svc-btn active" id="btn-intercession" onclick="selectService('Intercession')">🙏 Intercession</button>
+    <button class="svc-btn" id="btn-main" onclick="selectService('Main Service')">✝ Main Service</button>
+  </div>
+
+  <div class="service-card">
+    <div class="service-header">
+      <span class="svc-name" id="card-title">Intercession</span>
+      <span class="overall-badge" id="badge-overall">Overall: 0</span>
+    </div>
+    <div class="service-body">
+
+      <div class="row-group">
+        <div class="row-group-label">Adults</div>
+        <div class="count-row">
+          <label>Male</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('male',-1)">−</button>
+            <div class="val" id="val-male">0</div>
+            <button class="btn-plus" onclick="change('male',1)">+</button>
+          </div>
+        </div>
+        <div class="count-row">
+          <label>Female</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('female',-1)">−</button>
+            <div class="val" id="val-female">0</div>
+            <button class="btn-plus" onclick="change('female',1)">+</button>
+          </div>
+        </div>
+        <div class="computed-row">
+          <label>Total excl. children &amp; teachers</label>
+          <div class="cval" id="val-adults-total">0</div>
+        </div>
+      </div>
+
+      <div class="row-group">
+        <div class="row-group-label">Camp Victory Teachers</div>
+        <div class="count-row">
+          <label>Male teachers</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('teacherMale',-1)">−</button>
+            <div class="val" id="val-teacherMale">0</div>
+            <button class="btn-plus" onclick="change('teacherMale',1)">+</button>
+          </div>
+        </div>
+        <div class="count-row">
+          <label>Female teachers</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('teacherFemale',-1)">−</button>
+            <div class="val" id="val-teacherFemale">0</div>
+            <button class="btn-plus" onclick="change('teacherFemale',1)">+</button>
+          </div>
+        </div>
+        <div class="computed-row">
+          <label>Total teachers</label>
+          <div class="cval" id="val-teachers-total">0</div>
+        </div>
+      </div>
+
+      <div class="row-group">
+        <div class="row-group-label">Children</div>
+        <div class="count-row">
+          <label>In Camp Victory</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('childrenCV',-1)">−</button>
+            <div class="val" id="val-childrenCV">0</div>
+            <button class="btn-plus" onclick="change('childrenCV',1)">+</button>
+          </div>
+        </div>
+        <div class="count-row">
+          <label>In church (with parents)</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('childrenChurch',-1)">−</button>
+            <div class="val" id="val-childrenChurch">0</div>
+            <button class="btn-plus" onclick="change('childrenChurch',1)">+</button>
+          </div>
+        </div>
+        <div class="computed-row">
+          <label>Total children</label>
+          <div class="cval" id="val-children-total">0</div>
+        </div>
+      </div>
+
+      <div class="row-group">
+        <div class="row-group-label">First Timers in Adults Church</div>
+        <div class="count-row">
+          <label>Male</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('ftMale',-1)">−</button>
+            <div class="val" id="val-ftMale">0</div>
+            <button class="btn-plus" onclick="change('ftMale',1)">+</button>
+          </div>
+        </div>
+        <div class="count-row">
+          <label>Female</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('ftFemale',-1)">−</button>
+            <div class="val" id="val-ftFemale">0</div>
+            <button class="btn-plus" onclick="change('ftFemale',1)">+</button>
+          </div>
+        </div>
+        <div class="count-row">
+          <label>Child</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('ftChild',-1)">−</button>
+            <div class="val" id="val-ftChild">0</div>
+            <button class="btn-plus" onclick="change('ftChild',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-group">
+        <div class="row-group-label">Born Again</div>
+        <div class="count-row">
+          <label>Count</label>
+          <div class="counter">
+            <button class="btn-minus" onclick="change('bornAgain',-1)">−</button>
+            <div class="val" id="val-bornAgain">0</div>
+            <button class="btn-plus" onclick="change('bornAgain',1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overall-row">
+        <label>Overall Total</label>
+        <div class="cval" id="val-overall">0</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-reset" onclick="resetForm()">Reset</button>
+    <button class="btn btn-save" id="save-btn" onclick="saveRecord()">Save Record</button>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div id="tab-report" class="page">
+  <div class="report-select-wrap" style="margin-top:14px">
+    <label>Load Saved Record</label>
+    <select id="report-select" onchange="loadReport()">
+      <option value="">— select a record —</option>
+    </select>
+  </div>
+  <div id="report-preview" class="report-box">Select a saved record above to preview the formatted report.</div>
+  <button class="copy-btn" onclick="copyReport()">📋 Copy Report to Clipboard</button>
+</div>
+
+<!-- HISTORY -->
+<div id="tab-history" class="page">
+  <div style="margin-top:14px" id="history-list">
+    <div class="empty-state">No records saved yet.<br/>Fill in a count and tap <strong>Save Record</strong>.</div>
+  </div>
+</div>
+
+<script>
+  const FIELDS = ['male','female','teacherMale','teacherFemale','childrenCV','childrenChurch','ftMale','ftFemale','ftChild','bornAgain'];
+  let state = {};
+  let currentService = 'Intercession';
+  FIELDS.forEach(f => state[f] = 0);
+
+  document.getElementById('svc-date').value = new Date().toISOString().slice(0,10);
+
+  function selectService(svc) {
+    currentService = svc;
+    document.getElementById('card-title').textContent = svc;
+    document.getElementById('btn-intercession').classList.toggle('active', svc === 'Intercession');
+    document.getElementById('btn-main').classList.toggle('active', svc === 'Main Service');
+  }
+
+  function change(field, delta) {
+    state[field] = Math.max(0, state[field] + delta);
+    document.getElementById('val-' + field).textContent = state[field];
+    recalc();
+  }
+
+  function recalc() {
+    const adults = state.male + state.female;
+    const teachers = state.teacherMale + state.teacherFemale;
+    const children = state.childrenCV + state.childrenChurch;
+    const overall = adults + teachers + children;
+    document.getElementById('val-adults-total').textContent = adults;
+    document.getElementById('val-teachers-total').textContent = teachers;
+    document.getElementById('val-children-total').textContent = children;
+    document.getElementById('val-overall').textContent = overall;
+    document.getElementById('badge-overall').textContent = 'Overall: ' + overall;
+  }
+
+  function resetForm() {
+    FIELDS.forEach(f => { state[f] = 0; document.getElementById('val-' + f).textContent = 0; });
+    recalc();
+    const btn = document.getElementById('save-btn');
+    btn.textContent = 'Save Record'; btn.className = 'btn btn-save';
+  }
+
+  function saveRecord() {
+    const date = document.getElementById('svc-date').value;
+    const usher = document.getElementById('usher-name').value.trim();
+    if (!date) { alert('Please select a date.'); return; }
+    const key = 'hc_' + date + '_' + currentService.replace(/\s/g,'_');
+    localStorage.setItem(key, JSON.stringify({ date, svc: currentService, usher, ...state, ts: Date.now() }));
+    const btn = document.getElementById('save-btn');
+    btn.textContent = '✓ Saved!'; btn.className = 'btn btn-saved';
+    setTimeout(() => { btn.textContent = 'Save Record'; btn.className = 'btn btn-save'; }, 2000);
+    renderHistory(); populateReportSelect();
+  }
+
+  function getHistory() {
+    return Object.keys(localStorage).filter(k => k.startsWith('hc_'))
+      .map(k => JSON.parse(localStorage.getItem(k))).sort((a,b) => b.ts - a.ts);
+  }
+
+  function fmtDate(str) {
+    return new Date(str + 'T00:00:00').toLocaleDateString('en-ZA', { day:'numeric', month:'long', year:'numeric' });
+  }
+
+  function buildReport(r) {
+    const adults = r.male + r.female;
+    const teachers = r.teacherMale + r.teacherFemale;
+    const children = r.childrenCV + r.childrenChurch;
+    const overall = adults + teachers + children;
+    const ftTotal = r.ftMale + r.ftFemale + r.ftChild;
+    let t = '';
+    t += fmtDate(r.date) + '\n';
+    t += 'SERVICE COUNTS\n';
+    t += r.svc + '\n';
+    t += 'Male: ' + r.male + '\n';
+    t += 'Female: ' + r.female + '\n';
+    t += 'Total excluding children & teachers: ' + adults + '\n';
+    t += 'Camp Victory teachers: ' + teachers + '\n';
+    t += '  ' + r.teacherFemale + ' female  ' + r.teacherMale + ' male\n';
+    t += 'Children in Camp Victory: ' + r.childrenCV + '\n';
+    t += 'Children in church: ' + r.childrenChurch + '\n';
+    t += 'Total children: ' + children + '\n';
+    t += '\nOverall: ' + overall + '\n';
+    if (ftTotal > 0) {
+      t += '\nFirst timers in adults church: [' + ftTotal + ']\n';
+      if (r.ftMale)   t += '  ' + r.ftMale + ' Male\n';
+      if (r.ftFemale) t += '  ' + r.ftFemale + ' Female\n';
+      if (r.ftChild)  t += '  ' + r.ftChild + ' Child\n';
+    } else {
+      t += '\nFirst timers in adults church: 0\n';
+    }
+    t += '\nBorn again: ' + r.bornAgain + '\n';
+    t += '\nHead counts by ' + (r.usher || '___________');
+    return t;
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    const records = getHistory();
+    if (!records.length) {
+      list.innerHTML = '<div class="empty-state">No records saved yet.<br/>Fill in a count and tap <strong>Save Record</strong>.</div>';
+      return;
+    }
+    list.innerHTML = records.map(r => {
+      const adults = r.male + r.female;
+      const teachers = r.teacherMale + r.teacherFemale;
+      const children = r.childrenCV + r.childrenChurch;
+      const overall = adults + teachers + children;
+      const key = 'hc_' + r.date + '_' + r.svc.replace(/\s/g,'_');
+      return `<div class="history-card">
+        <div class="history-head">
+          <div><div class="hdate">${fmtDate(r.date)}</div><div class="hsvc">${r.svc}</div></div>
+          <button class="hdelete" onclick="deleteRecord('${key}')">🗑</button>
+        </div>
+        <div class="history-body">
+          <div class="hrow"><span>Male / Female</span><strong>${r.male} / ${r.female}</strong></div>
+          <div class="hrow"><span>Adults total</span><strong>${adults}</strong></div>
+          <div class="hrow"><span>Teachers (F / M)</span><strong>${r.teacherFemale} / ${r.teacherMale}</strong></div>
+          <div class="hrow"><span>Children</span><strong>${children}</strong></div>
+          <div class="hrow"><span>Born again</span><strong>${r.bornAgain}</strong></div>
+          <div class="htotal">Overall: ${overall}</div>
+          ${r.usher ? `<div class="husher">By ${r.usher}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteRecord(key) {
+    if (confirm('Delete this record?')) { localStorage.removeItem(key); renderHistory(); populateReportSelect(); }
+  }
+
+  function populateReportSelect() {
+    const sel = document.getElementById('report-select');
+    const records = getHistory();
+    sel._records = records;
+    sel.innerHTML = '<option value="">— select a record —</option>' +
+      records.map((r,i) => `<option value="${i}">${fmtDate(r.date)} — ${r.svc}</option>`).join('');
+  }
+
+  function loadReport() {
+    const sel = document.getElementById('report-select');
+    if (sel.value === '') { document.getElementById('report-preview').textContent = 'Select a saved record above to preview the formatted report.'; return; }
+    document.getElementById('report-preview').textContent = buildReport(sel._records[parseInt(sel.value)]);
+  }
+
+  function copyReport() {
+    const text = document.getElementById('report-preview').textContent;
+    if (!text || text.startsWith('Select')) { alert('Please select a record first.'); return; }
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy Report to Clipboard', 2000);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      alert('Copied!');
+    });
+  }
+
+  function showTab(name, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    el.classList.add('active');
+    if (name === 'history') renderHistory();
+    if (name === 'report') populateReportSelect();
+  }
+
+  recalc();
+</script>
+</body>
+</html>
